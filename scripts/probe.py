@@ -51,7 +51,11 @@ def probe(url):
         if tools is None:
             msg = str((tl.get("error") or {}).get("message", "no tools/list result"))[:80]
             return {"status": "auth" if any(k in msg.lower() for k in ("auth", "token", "key", "unauthor")) else "down", "error": msg, "server_name": info.get("name")}
-        return {"status": "open", "tools": len(tools), "tool_names": [t.get("name") for t in tools][:40], "ms": int((time.time() - t0) * 1000),
+        return {"status": "open", "tools": len(tools), "tool_names": [t.get("name") for t in tools][:40],
+                # tool annotations (MCP 2025-03-26+): how many tools say they are read-only / destructive / open-world
+                "ann": {"read_only": sum(1 for t in tools if (t.get("annotations") or {}).get("readOnlyHint") is True),
+                        "destructive": sum(1 for t in tools if (t.get("annotations") or {}).get("destructiveHint") is True),
+                        "annotated": sum(1 for t in tools if t.get("annotations"))}, "ms": int((time.time() - t0) * 1000),
                 "server_name": info.get("name"), "server_version": info.get("version")}
     except urllib.error.HTTPError as e:
         return {"status": "auth" if e.code in (401, 402, 403) else "down", "error": f"HTTP {e.code}"}
