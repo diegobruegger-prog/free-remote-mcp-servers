@@ -115,7 +115,7 @@ Remote [Model Context Protocol](https://modelcontextprotocol.io) servers from th
 
 | Client | How |
 |---|---|
-| Claude (claude.ai, desktop) | Settings, Connectors, Add custom connector, paste the URL |
+| Claude (claude.ai, desktop) | Customize, Connectors, + Add, Add custom connector, paste the URL |
 | Claude Code | `claude mcp add --transport http NAME URL` |
 | Cursor | `{{"mcpServers": {{"NAME": {{"url": "URL"}}}}}}` in `~/.cursor/mcp.json` |
 | VS Code | `{{"servers": {{"NAME": {{"type": "http", "url": "URL"}}}}}}` in `.vscode/mcp.json` |
