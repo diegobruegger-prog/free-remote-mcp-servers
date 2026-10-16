@@ -7,6 +7,7 @@ Remote [Model Context Protocol](https://modelcontextprotocol.io) servers from th
 - Full list: [`data/servers.csv`](data/servers.csv) and [`data/servers.json`](data/servers.json)
 - Browse with search and topics: [shortformkit.com/free-remote-mcp-servers](https://shortformkit.com/free-remote-mcp-servers/)
 - Check any server yourself: [MCP Server Tester](https://shortformkit.com/mcp-server-tester/)
+- Analysis with charts (failure reasons, hosting, tool counts): [State of remote MCP servers 2026](https://shortformkit.com/state-of-remote-mcp-servers-2026/)
 
 ## Add a server to your client
 
