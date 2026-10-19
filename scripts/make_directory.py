@@ -59,7 +59,7 @@ for u, p in probe.items():
     if p["status"] == "open" and p.get("tools", 0) > 0 and u in by_url:
         r = by_url[u]
         raw.append({"name": r["name"], "title": r["title"], "description": r["description"].strip(), "url": u, "website": r["website"], "repo": r["repo"],
-                    "tools": p["tools"], "tool_names": p.get("tool_names", []), "ms": p.get("ms")})
+                    "tools": p["tools"], "tool_names": p.get("tool_names", []), "ms": p.get("ms"), "ann": p.get("ann") or {}})
 ts = collections.Counter(tuple(sorted(x["tool_names"])) for x in raw)
 dc = collections.Counter(x["description"].lower() for x in raw)
 servers, per = [], collections.Counter()
@@ -87,15 +87,24 @@ tested = max((p.get("tested", "") for p in probe.values()), default="")
 stats = {"registry_remotes": len(reg_rows), "probed": len(probe), "answered_open": counts["open"], "auth": counts["auth"], "down": counts["down"],
          "open_pct": round(100 * counts["open"] / max(1, len(probe))), "listed": len(servers),
          "featured": sum(len(v) for v in featured.values()), "topics": collections.Counter(x["topic"] for x in servers).most_common()}
+# tool annotations as the servers declare them (readOnlyHint / destructiveHint): self-reported, not verified by us
+openp = [p for p in probe.values() if p["status"] == "open" and p.get("tools")]
+tools_all = sum(p["tools"] for p in openp)
+ann = {k: sum((p.get("ann") or {}).get(k, 0) for p in openp) for k in ("annotated", "read_only", "destructive")}
+stats["annotations"] = {"open_servers": len(openp), "tools": tools_all, **ann,
+                        "servers_any_annotation": sum(1 for p in openp if (p.get("ann") or {}).get("annotated")),
+                        "servers_no_annotation": sum(1 for p in openp if not (p.get("ann") or {}).get("annotated"))}
 import csv
 keep = ("name", "title", "description", "url", "topic", "tools", "tool_names", "website", "repo")
-rows = [{k: s.get(k) for k in keep} for s in servers]
+rows = [{**{k: s.get(k) for k in keep}, "tools_annotated": s["ann"].get("annotated", 0), "tools_read_only": s["ann"].get("read_only", 0),
+         "tools_destructive": s["ann"].get("destructive", 0)} for s in servers]
 (ROOT / "data").mkdir(exist_ok=True)
 (ROOT / "data" / "servers.json").write_text(json.dumps({"tested": tested, "stats": stats, "servers": rows}, ensure_ascii=False, indent=1))
 with (ROOT / "data" / "servers.csv").open("w", newline="") as fh:
-    w = csv.writer(fh); w.writerow(["name", "title", "topic", "url", "tools", "tool_names", "description", "website", "repo"])
+    w = csv.writer(fh); w.writerow(["name", "title", "topic", "url", "tools", "tool_names", "description", "website", "repo", "tools_annotated", "tools_read_only", "tools_destructive"])
     for r in rows:
-        w.writerow([r["name"], r["title"], r["topic"], r["url"], r["tools"], " ".join(r["tool_names"]), r["description"], r["website"], r["repo"]])
+        w.writerow([r["name"], r["title"], r["topic"], r["url"], r["tools"], " ".join(r["tool_names"]), r["description"], r["website"], r["repo"],
+                    r["tools_annotated"], r["tools_read_only"], r["tools_destructive"]])
 
 ORDER = ["Search and web", "Documentation and knowledge", "Developer tools", "Weather, maps and travel", "Media and content", "Finance and crypto",
          "Science, health and research", "Open data and government", "Business and marketing", "AI, agents and memory", "Utilities", "Other"]
@@ -107,6 +116,7 @@ Remote [Model Context Protocol](https://modelcontextprotocol.io) servers from th
 
 **Last run: {tested}** · {stats['probed']:,} endpoints tested · **{stats['answered_open']:,} open ({stats['open_pct']} %)** · {stats['auth']:,} need auth · {stats['down']:,} not working · {stats['listed']:,} listed after removing copies
 
+- Tool annotations (as declared by the servers, not verified): {stats['annotations']['servers_no_annotation']:,} of {stats['annotations']['open_servers']:,} open servers annotate none of their tools. Of {stats['annotations']['tools']:,} tools, {stats['annotations']['annotated']:,} carry annotations, {stats['annotations']['read_only']:,} say readOnlyHint true, {stats['annotations']['destructive']:,} say destructiveHint true. Per server in the `tools_annotated`, `tools_read_only` and `tools_destructive` columns. Note: we only see the tools a server lists without a key.
 - Full list: [`data/servers.csv`](data/servers.csv) and [`data/servers.json`](data/servers.json)
 - Browse with search and topics: [shortformkit.com/free-remote-mcp-servers](https://shortformkit.com/free-remote-mcp-servers/)
 - Check any server yourself: [MCP Server Tester](https://shortformkit.com/mcp-server-tester/)
