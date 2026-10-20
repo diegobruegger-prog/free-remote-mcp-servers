@@ -9,6 +9,7 @@ Remote [Model Context Protocol](https://modelcontextprotocol.io) servers from th
 - Browse with search and topics: [shortformkit.com/free-remote-mcp-servers](https://shortformkit.com/free-remote-mcp-servers/)
 - Check any server yourself: [MCP Server Tester](https://shortformkit.com/mcp-server-tester/)
 - Analysis with charts (failure reasons, hosting, tool counts): [State of remote MCP servers 2026](https://shortformkit.com/state-of-remote-mcp-servers-2026/)
+- Key numbers with dates, ready to cite: [MCP statistics 2026](https://shortformkit.com/mcp-statistics/)
 
 ## Add a server to your client
 
@@ -18,6 +19,16 @@ Remote [Model Context Protocol](https://modelcontextprotocol.io) servers from th
 | Claude Code | `claude mcp add --transport http NAME URL` |
 | Cursor | `{"mcpServers": {"NAME": {"url": "URL"}}}` in `~/.cursor/mcp.json` |
 | VS Code | `{"servers": {"NAME": {"type": "http", "url": "URL"}}}` in `.vscode/mcp.json` |
+
+## Is your server in the list?
+
+Show its live status in your README. The badge re-tests the endpoint about once an hour (same two read-only requests) and links to the full test result:
+
+```markdown
+[![MCP status](https://shortformkit.com/api/mcp-badge?url=YOUR_URL_ENCODED)](https://shortformkit.com/mcp-server-tester/?url=YOUR_URL_ENCODED)
+```
+
+Replace `YOUR_URL_ENCODED` with your endpoint, URL-encoded, or run the [MCP Server Tester](https://shortformkit.com/mcp-server-tester/) once and copy the ready-made badge from the result.
 
 ## Picks by topic
 
